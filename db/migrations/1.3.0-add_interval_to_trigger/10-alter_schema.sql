@@ -1,0 +1,1 @@
+ALTER TABLE events ADD COLUMN runTime timestamp without time zone DEFAULT null;

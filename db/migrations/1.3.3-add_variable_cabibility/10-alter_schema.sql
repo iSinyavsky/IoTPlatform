@@ -1,0 +1,1 @@
+ALTER TABLE variables ADD COLUMN integration_capability varchar(256) DEFAULT '';

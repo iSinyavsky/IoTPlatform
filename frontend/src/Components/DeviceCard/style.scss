@@ -1,0 +1,30 @@
+.service{
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  font-size: 8px;
+  color: #fff;
+  font-weight: bold;
+}
+
+.var-settings{
+    opacity: 0;
+    transition: .4s;
+    position: absolute;
+    top: 4px;
+    right: 30px;
+    font-size: 24px;
+}
+.device-card:hover .var-settings{
+  opacity: 1;
+}
+.delete{
+  opacity: 0;
+  transition: .4s;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+.device-card:hover .delete{
+  opacity: 1;
+}

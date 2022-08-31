@@ -1,0 +1,3 @@
+#!/bin/bash
+docker exec iotproject-container-db bash -c 'cd tmp && pg_dump -U postgres -d iot > iot_dump.sql'
+docker cp iotproject-container-db:/tmp/iot_dump.sql ./iot.sql

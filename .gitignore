@@ -1,0 +1,4 @@
+database/*
+tmp/*
+/database/
+frontend/node_modules

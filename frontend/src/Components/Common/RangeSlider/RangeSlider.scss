@@ -1,0 +1,19 @@
+.slider{
+  -webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+  width: calc(100% - 20px); /* Full-width */
+  height: 25px; /* Specified height */
+  background: #f1f1f1; /* Grey background */
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 6px;
+  outline: none; /* Remove outline */
+  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+  -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+  transition: opacity .2s;
+}
+
+.slider-value{
+  position: absolute;
+  top: -30px;
+  right: 10px;
+}

@@ -1,0 +1,33 @@
+.title-input{
+  width: calc(100% - 20px);
+  border: none;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  margin: 10px;
+  outline: none;
+  font-size: 14px;
+  padding: 10px 5px;
+  color: #555;
+  height: 32px;
+  max-height: 60px;
+}
+.title-input.main{
+  font-size: 16px;
+  border-bottom: none;
+  padding: 0;
+}
+.title-input.main:hover{
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+.card-label{
+  margin: 10px;
+}
+.chart-panel{
+  position: absolute;
+  right: 0;
+  top: -40px;
+
+  button{
+    margin: 0 0 0 10px;
+  }
+}
+

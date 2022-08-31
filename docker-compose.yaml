@@ -1,0 +1,86 @@
+version: '2.1'
+
+networks:
+  main:
+    driver: bridge
+
+
+services:
+  web-server:
+    image: nginx:latest
+    restart: always
+    ports:
+      - 80:80
+    links:
+      - iot.go:klik4ik/iotproject
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./frontend/public:/var/www
+    networks:
+      main:
+        aliases:
+          - iot-web_1.dev
+  iot.go:
+    build: .
+    volumes:
+      - ./:/var/www/iotProject
+    links:
+      - postgres
+    networks:
+      main:
+        aliases:
+          - ws_1_api.dev
+          - klik4ik/iotproject232
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mosca-broker:
+        condition: service_healthy
+    command: bash -c "cd /var/www/iotProject && air"
+    ports:
+      - "1234:1234"
+  postgres:
+    image: 'postgres:12.2'
+    container_name: "iotproject-container-db"
+    volumes:
+      - ./database:/var/lib/postgresql/data
+      - ./iot.sql:/tmp/iot.sql
+    networks:
+      main:
+        aliases:
+          - ws_1_db
+    environment:
+      - POSTGRES_PASSWORD=hydra123
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=iot
+    healthcheck:
+      test: "exit 0"
+  pgadmin:
+    image: dpage/pgadmin4
+    networks:
+      - main
+    links:
+      - postgres
+    depends_on:
+      - postgres
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: 123456
+    volumes:
+      - ./pgadmin:/root/.pgadmin
+    ports:
+      - "5050:80"
+    logging:
+          driver: none
+  mosca-broker:
+    build: mosca
+    volumes:
+      - "./mosca:/mosca"
+    command: bash -c "npm i && npm run start"
+    networks:
+      - main
+    healthcheck:
+      test: "curl --fail http://localhost:9999/health || exit 1"
+    ports:
+      - "1883:1883"
+      - "3333:3000"

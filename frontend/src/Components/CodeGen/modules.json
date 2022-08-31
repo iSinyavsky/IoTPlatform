@@ -1,0 +1,20 @@
+[
+  {"name":  "Датчик температуры DHT11/DHT22", "pins":  [""], "type":  "d", "pubSub": 0,
+    "id": "",
+    "label": "dht11",
+    "data": "number"
+  },
+  {"name":  "Модуль реле", "pins":  [""], "type":  "d","pubSub": 1,
+    "id": "",
+    "label": "relay_d",
+    "data": "bool"
+  },
+  {"name":  "Датчик температуры (аналоговый)", "pins":  [""], "type":  "d","pubSub": 0,
+    "id": "", "label": "temp_a",
+    "data": "number"
+  },
+  {"name":  "Модуль PWM (шим)", "pins":  [""], "type":  "d","pubSub": 0,
+    "id": "", "label": "pwmModule",
+    "data": "number"
+  }
+]

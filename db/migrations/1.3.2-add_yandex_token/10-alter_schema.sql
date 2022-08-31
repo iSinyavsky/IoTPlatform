@@ -1,0 +1,1 @@
+ALTER TABLE users ADD COLUMN ya_token varchar(256) DEFAULT null;

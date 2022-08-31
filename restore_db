@@ -1,0 +1,5 @@
+#!/bin/bash
+docker-compose stop iot.go;
+docker exec iotproject-container-db bash -c 'cd tmp && psql -U postgres -c "drop database iot" && psql -U postgres -c "create database iot" && psql -U postgres -c "grant all privileges on database iot to postgres" && psql -U postgres -d iot -1 -f iot.sql'
+docker-compose up -d iot.go;
+

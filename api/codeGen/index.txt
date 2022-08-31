@@ -1,0 +1,126 @@
+//Вам необходимо скачать недостающие библиотеки
+
+#include "ESP8266WiFi.h"
+#include "Adafruit_MQTT.h"
+#include "Adafruit_MQTT_Client.h"
+{{ range $i, $m  := .ModulesChosed }}
+{{ if eq .Label "dht11" }}
+#include "DHT.h"
+DHT {{$m.Label}}{{$i}}({{index $m.Pins 0}}, DHT11);
+{{ end }}
+{{ end }}
+
+
+#define WLAN_SSID       "{{.SSID}}"
+#define WLAN_PASS       "{{.Pass}}"
+
+/************************* MQTT Login, Password *********************************/
+
+#define AIO_SERVER      "159.122.98.156" // miemThings host
+#define AIO_SERVERPORT  8443                   // use 8883 for SSL
+#define AIO_USERNAME    "mosquitto"
+#define AIO_KEY         ""
+
+WiFiClient client;
+Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_KEY);
+{{$token := .MqttToken}}
+{{ range $i, $m := .ModulesChosed }}
+{{ if eq $m.PubSub 0 }}
+Adafruit_MQTT_Publish {{$m.Label}}{{$i}} = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME, "value/{{$token}}/{{$m.Label}}{{$i}}");
+{{ end }}
+{{ if eq $m.PubSub 1 }}
+Adafruit_MQTT_Subscribe {{$m.Label}}{{$i}} = Adafruit_MQTT_Subscribe(&mqtt, AIO_USERNAME, "value/{{$token}}/{{$m.Label}}{{$i}}");
+{{ end }}
+{{ end }}
+void MQTT_connect();
+
+void setup() {
+  Serial.begin(115200);
+  delay(10);
+
+  WiFi.begin(WLAN_SSID, WLAN_PASS);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println();
+
+  {{ range $i, $m  := .ModulesChosed }}
+  {{ if eq .Label "dht11" }}
+  {{$m.Label}}{{$i}}.begin();
+  {{ end }}
+
+  {{ if eq $m.PubSub 1 }}
+  pinMode({{index $m.Pins 0}},OUTPUT);
+  {{end}}
+  {{ end }}
+}
+
+
+void loop() {
+  delay(10000); // 10 секунд задержки
+
+
+  MQTT_connect();
+
+
+    {{ range $i, $m  := .ModulesChosed }}
+    {{ if eq $m.Label "dht11" }}
+      float h = {{$m.Label}}{{$i}}.readHumidity(); //Измеряем влажность
+      float t = {{$m.Label}}{{$i}}.readTemperature(); //Измеряем температуру
+      {{$m.Label}}{{$i}}.publish(h);
+      {{$m.Label}}{{$i}}.publish(t);
+    {{ end }}
+
+
+    Adafruit_MQTT_Subscribe *subscription;
+      while ((subscription = mqtt.readSubscription(5000))) {
+      {{ if eq $m.PubSub 1 }}
+        if (subscription == &{{$m.Label}}{{$i}}) {
+          {{ if eq $m.Data "bool" }}
+          if (strcmp((char *){{$m.Label}}{{$i}}.lastread, "ON") == 0) {
+                  digitalWrite(LED, LOW);
+          }
+          if (strcmp((char *){{$m.Label}}{{$i}}.lastread, "OFF") == 0) {
+                  digitalWrite(LED, HIGH);
+          }
+          {{ end }}
+        }
+      {{ end }}
+      }
+
+    {{ end }}
+
+
+  if(! mqtt.ping()) {
+      mqtt.disconnect();
+    }
+}
+
+
+void MQTT_connect() {
+  int8_t ret;
+
+  // Stop if already connected.
+  if (mqtt.connected()) {
+    return;
+  }
+
+
+  Serial.print("Connecting to MQTT... ");
+
+  uint8_t retries = 3;
+  while ((ret = mqtt.connect()) != 0) { // connect will return 0 for connected
+       Serial.println(mqtt.connectErrorString(ret));
+       Serial.println("Retrying MQTT connection in 5 seconds...");
+       mqtt.disconnect();
+       delay(5000);  // wait 5 seconds
+       retries--;
+       if (retries == 0) {
+         // basically die and wait for WDT to reset me
+         while (1);
+       }
+  }
+  Serial.println("MQTT Connected!");
+}
+
